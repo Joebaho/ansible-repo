@@ -6,7 +6,7 @@
     - name: Upgrade all apache nodes # yum update -y 
       ansible.builtin.yum:
         name: '*'
-        state : latest
+        state: latest
     - name: Install the latest version od Apache on the nodes #yum install httpd -y
       ansible.builtin.yum:
         name: httpd
@@ -17,27 +17,47 @@
         state: started
     - name: enable httpd #systemctl enable httpd
       ansible.builtin.service:
-        name : httpd
-        enabled : yes 
-    - name : copy content of the file index.html from controller to nodes at /var/www/html/!And 
+        name: httpd
+        enable: yes 
+    - name: copy content of the file index.html from controller to nodes at /var/www/html/!And 
       ansible.builtin.copy:
         src: /root/web/index.html
         dest: /var/www/html/
+      notify: 
+        - restarting apache2  
+  handlers:
+    - name: restarting apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
     - name: install git
       apt:
         name: git
         state: present 
-
+- name: using debug to print my name on the nodes
+  hosts: amazon-nodes
+  vars:
+    Builder_name: Joseph Mbatchou
+  tasks:
+    - name: using debug on the amazon-nodes
+      ansible.builtin.debug:
+        msg: "{{ Builder_name }}"
  # Play 2        
 
 - name: Setting up apache webserver on ubuntu nodes
-  hosts : ubuntu-nodes
-  tasks :
-    - name : Upgrade all apache nodes # yum update -y 
+  hosts: ubuntu-nodes
+  vars:
+  handlers:
+    - name: restarting apache2
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
+  tasks:
+    - name: Upgrade all apache nodes # yum update -y 
       ansible.builtin.apt:
-        name : '*'
-        state : latest
-    - name : Install the latest version od Apache on the nodes #yum install httpd -y
+        name: '*'
+        state: latest
+    - name: Install the latest version od Apache on the nodes #yum install httpd -y
       ansible.builtin.apt:
         name : apache2
         state : present
@@ -49,10 +69,15 @@
       ansible.builtin.service:
         name : apache2
         enabled : yes 
+    - name : using debug to print my name on the nodes while it is launching
+      ansible.builtin.debug:
+        msg: "{{ Joseph Mbatchou }}"
     - name : copy content of the file index.html from controller to nodes at /var/www/html/!And 
       ansible.builtin.copy:
         src: /root/web/index.html
         dest : /var/www/html/
+      notify:
+        - restarting apache  
     - name: install git
       apt:
         name: git
