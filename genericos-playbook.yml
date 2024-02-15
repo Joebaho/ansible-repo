@@ -1,0 +1,28 @@
+- name: Setting up apache webserver on amazon and ubuntu nodes
+  hosts: amazon-nodes:ubuntu-nodes
+  tasks:
+    - name: Upgrade all apache nodes # yum update -y 
+      ansible.builtin.package:
+        name: ntpdate
+        state: present
+        use: auto
+    - name: Install the latest version of Apache on the nodes #yum install httpd -y
+      ansible.builtin.package:
+        name : 
+          - apache2
+          - httpd
+        state : latest
+    - name : start apache # systemctl start httpd
+      ansible.builtin.service:
+        name : 
+          - apache2
+          - httpd
+        state : started
+    - name : enable apache #systemctl enable httpd
+      ansible.builtin.service:
+        name : 
+          - apache2
+          - httpd
+        enabled : yes 
+  
+    

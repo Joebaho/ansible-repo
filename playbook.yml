@@ -1,14 +1,14 @@
 #play 1
 
 - name: Setting up apache webserver on amazon nodes
-  hosts: amazon-nodes
+  hosts: linux-nodes
   tasks:
     - name: Upgrade all apache nodes # yum update -y 
-      ansible.builtin.yum:
+      ansible.builtin.dnf:  # the new package of httpd linux is dnf instead of yum 
         name: '*'
         state: latest
-    - name: Install the latest version od Apache on the nodes #yum install httpd -y
-      ansible.builtin.yum:
+    - name: Install the latest version of Apache on the nodes #yum install httpd -y
+      ansible.builtin.dnf:
         name: httpd
         state: latest 
     - name: start httpd # systemctl start httpd
@@ -18,28 +18,29 @@
     - name: enable httpd #systemctl enable httpd
       ansible.builtin.service:
         name: httpd
-        enable: yes 
-    - name: copy content of the file index.html from controller to nodes at /var/www/html/!And 
+        enabled: yes 
+    - name: copy content of the file index.html from controller to nodes at /var/www/html/
       ansible.builtin.copy:
         src: /root/web/index.html
         dest: /var/www/html/
       notify: 
-        - restarting apache2  
+        - restarting apache 
+    - name: install git
+      dnf:
+        name: git
+        state: present  
   handlers:
     - name: restarting apache
       ansible.builtin.service:
         name: httpd
         state: restarted
-    - name: install git
-      apt:
-        name: git
-        state: present 
+    
 - name: using debug to print my name on the nodes
-  hosts: amazon-nodes
+  hosts: linux-nodes
   vars:
     Builder_name: Joseph Mbatchou
   tasks:
-    - name: using debug on the amazon-nodes
+    - name: using debug on the linux-nodes
       ansible.builtin.debug:
         msg: "{{ Builder_name }}"
  # Play 2        
@@ -62,7 +63,7 @@
         name : apache2
         state : present
     - name : start apache # systemctl start httpd
-      ansible.buitlin.service:
+      ansible.builtin.service:
         name : apache2
         state : started
     - name : enable apache #systemctl enable httpd
@@ -71,31 +72,15 @@
         enabled : yes 
     - name : using debug to print my name on the nodes while it is launching
       ansible.builtin.debug:
-        msg: "{{ Joseph Mbatchou }}"
+        msg: " Joseph Mbatchou "
     - name : copy content of the file index.html from controller to nodes at /var/www/html/!And 
       ansible.builtin.copy:
         src: /root/web/index.html
         dest : /var/www/html/
       notify:
-        - restarting apache  
+        - restarting apache2 
     - name: install git
       apt:
         name: git
         state: present     
 
-# # play 3 install Github on nodes  
-# - name: Install Github on amazon nodes
-#   hosts : Amazon-nodes
-#   tasks : 
-        # - name: install git
-        #   yum:
-        #     name: git
-        #     state: present        
-
-# - name: Install Github on ubuntu nodes
-#   hosts : ubuntu-nodes
-#   tasks :  
-        # - name: install git
-        #   apt:
-        #     name: git
-        #     state: present  

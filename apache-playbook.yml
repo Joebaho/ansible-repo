@@ -1,0 +1,50 @@
+- name: Setting up apache webserver on amazon nodes
+  hosts: Linux-servers
+  tasks:
+    - name: Upgrade all apache nodes
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+    - name: Install the latest version of Apache on the nodes
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+    - name: start httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+    - name: enable httpd
+      ansible.builtin.service:
+        name: httpd
+        enabled: 'yes'
+    - name: copy content of the file index.html from controller to nodes at /var/www/html/
+      ansible.builtin.copy:
+        src: /root/web/index.html
+        dest: /var/www/html/
+      notify:
+        - restarting apache2
+  handlers:
+    - name: restarting apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+- name: using debug to print my name on the nodes
+  hosts: Linux-servers
+  vars:
+    Builder_name: Joseph Mbatchou
+  tasks:
+    - name: using debug on the amazon-nodes
+      ansible.builtin.debug:
+        msg: '{{ Builder_name }}'
+- name: Install git on amazon nodes
+  hosts: Linux-servers
+  tasks:
+    - name: install git
+      apt:
+        name: git
+        state: present
+- name: ping all the servers
+  hosts: Linux-servers
+  tasks:
+    - name: ping all servers
+      ansible.builtin.ping: null
